@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shadow Escape</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#eee;font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;user-select:none}
+#app{position:fixed;inset:0}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000}
+.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.over{background:rgba(5,6,10,.88);padding:16px;overflow:auto}
+#join{display:flex;background:radial-gradient(ellipse at 50% 30%,#2a0d14,#07080c 70%)}
+h1{font-size:46px;margin:0 0 4px;letter-spacing:2px;color:#ff4d4d;text-shadow:0 0 22px #a00}
+.sub{color:#9aa3b5;margin:0 0 22px}
+.card{background:#12151d;border:1px solid #2b3142;border-radius:16px;padding:22px 26px;min-width:320px;max-width:94vw}
+input,select{font-size:20px;padding:12px 14px;border-radius:10px;border:1px solid #3a4258;background:#0b0d13;color:#fff;width:100%;margin:6px 0;text-align:center}
+#code{text-transform:uppercase;letter-spacing:8px;font-size:28px;font-weight:700}
+label.l{display:block;text-align:left;color:#9aa3b5;font-size:14px;margin-top:8px}
+button{font:inherit;cursor:pointer}
+.big{font-size:22px;font-weight:700;padding:14px 26px;border-radius:12px;border:0;background:#d92b2b;color:#fff;margin-top:10px;width:100%}
+.big:hover{background:#f03c3c}
+#jmsg{color:#ffb347;min-height:22px;margin-top:8px;font-size:15px}
+/* lobby */
+#lobby{background:radial-gradient(ellipse at 50% 0%,#1c1022,#07080c 70%);overflow:auto;justify-content:flex-start;padding:18px}
+#lobby h2{margin:6px 0}
+#lobPlayers{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0 14px}
+.chip{background:#1a1f2c;border:1px solid #2f3750;border-radius:20px;padding:6px 14px;font-size:17px}
+.chip.me{border-color:#ff4d4d;background:#2a1318}
+#jobGrid{display:grid;grid-template-columns:repeat(4,minmax(150px,200px));gap:12px;justify-content:center}
+@media(max-width:900px){#jobGrid{grid-template-columns:repeat(2,1fr)}}
+.job{background:#141824;border:2px solid #2b3142;border-radius:14px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:3px;position:relative}
+.job:hover{border-color:#6b7aa5}
+.job.sel{border-color:#ff4d4d;background:#2a1318;box-shadow:0 0 16px rgba(255,60,60,.4)}
+.job.taken{opacity:.35;cursor:not-allowed}
+.je{font-size:40px}
+.job small{color:#a9b3c8;font-size:12.5px}.job .jd{color:#8793aa;font-size:12px}
+.job em{position:absolute;top:6px;right:8px;font-size:12px;color:#ffb347}
+/* HUD */
+#hud{position:absolute;inset:0;display:none;pointer-events:none}
+#topbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:min(520px,60vw);text-align:center}
+#progWrap{height:16px;background:rgba(0,0,0,.6);border:1px solid #3a4258;border-radius:10px;overflow:hidden}
+#progBar{height:100%;width:0;background:linear-gradient(90deg,#3ddc84,#b6ff6a);transition:width .4s}
+#progTxt{font-size:14px;margin-top:3px;text-shadow:0 0 4px #000}
+#hudRole{position:absolute;top:10px;left:10px;padding:5px 12px;border-radius:8px;font-weight:700;font-size:15px;background:rgba(0,0,0,.6)}
+#hudRole.killer{color:#ff5a5a;border:1px solid #a00}#hudRole.crew{color:#7fe3ff;border:1px solid #2a6a80}
+#fps{position:absolute;left:10px;top:190px;display:none;font:12px monospace;color:#9fe3b0;background:rgba(0,0,0,.55);padding:3px 8px;border-radius:6px}
+#hudMap{position:absolute;top:46px;left:10px;font-size:13px;color:#c0c8d8;text-shadow:0 0 4px #000}
+#mini{position:absolute;top:10px;right:10px;border:1px solid #3a4258;border-radius:8px;width:180px;height:240px}
+#taskList{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.62);border:1px solid #333b4e;border-radius:10px;padding:8px 12px;font-size:14px;text-align:left;max-width:270px;line-height:1.5}
+#taskList .td{color:#7be39b;text-decoration:line-through}#taskList .gh{color:#9fd6ff;margin-top:4px}
+#abil{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.62);border:1px solid #333b4e;border-radius:10px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;font-size:15px;min-width:150px}
+#abil .ai{font-size:28px}#abil small{color:#9fb0cc;font-size:12px}
+#killbtn{position:absolute;right:10px;bottom:98px;background:rgba(40,0,0,.75);border:2px solid #7a1a1a;border-radius:10px;padding:8px 14px;flex-direction:column;align-items:center;font-size:17px;display:none}
+#killbtn.hot{border-color:#ff3030;box-shadow:0 0 20px #f00;animation:pulse .6s infinite alternate}
+#killbtn small{color:#e9a0a0;font-size:12px}
+@keyframes pulse{to{transform:scale(1.07)}}
+#prompt{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);border:1px solid #4a5570;padding:10px 20px;border-radius:12px;font-size:20px;display:none;white-space:nowrap}
+#prompt b{background:#ffd34a;color:#000;border-radius:5px;padding:0 7px}
+#cross{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.6)}
+.hbtn{position:absolute;pointer-events:auto;background:rgba(0,0,0,.65);border:1px solid #3a4258;color:#fff;border-radius:8px;padding:6px 12px;font-size:14px}
+#btnClues{left:10px;top:70px}#btnMenu{left:10px;top:110px}
+#btnBreak{position:absolute;left:10px;top:150px;z-index:15;display:none;background:rgba(20,50,80,.85);border:1px solid #4a9ad0;color:#cfeaff;border-radius:8px;padding:6px 12px;font-size:14px}
+#breakbox{z-index:20;background:radial-gradient(ellipse at 50% 40%,#16314f,#0a1424 75%);padding:20px}
+#breakbox h1{color:#bfe3ff;text-shadow:none;letter-spacing:0;font-size:44px}#breakbox p{font-size:22px;line-height:1.5;color:#cfe0f0;max-width:560px}
+#progTxt.low{color:#ff7b7b;font-weight:700}
+#bodyBanner{position:absolute;left:50%;top:26%;transform:translateX(-50%);z-index:30;display:none;pointer-events:none;text-align:center;background:rgba(70,0,0,.92);border:3px solid #ff3030;border-radius:20px;padding:20px 40px;box-shadow:0 0 60px #f00;max-width:92vw}
+#bodyBanner.pop{animation:bbpop .5s ease-out}
+#bbT{font-size:clamp(34px,6vw,64px);font-weight:900;color:#ff4a4a;letter-spacing:2px}
+#bbS{font-size:clamp(20px,3vw,30px);margin-top:8px;color:#ffe3e3}
+#bbS small{font-size:.7em;color:#ffb3b3}
+@keyframes bbpop{0%{transform:translateX(-50%) scale(.4);opacity:0}60%{transform:translateX(-50%) scale(1.12);opacity:1}100%{transform:translateX(-50%) scale(1)}}
+#toast{position:absolute;top:70px;left:50%;transform:translateX(-50%);width:min(620px,92vw);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;z-index:5}
+.tst{background:rgba(10,12,18,.88);border:1px solid #4a5570;padding:9px 16px;border-radius:10px;font-size:17px;transition:opacity .4s;opacity:1}
+.tst.out{opacity:0}.tst.bad{border-color:#a33;background:rgba(40,8,8,.9)}.tst.good{border-color:#2a8;background:rgba(6,36,22,.9)}.tst.clue{border-color:#d9a400;background:rgba(40,30,0,.92)}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75) 100%)}
+#danger{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(255,0,0,.65) 100%)}
+#flash{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
+#lockhint{position:absolute;inset:0;display:none;align-items:flex-end;justify-content:center;padding-bottom:140px;cursor:pointer;z-index:4;pointer-events:none}
+#lockhint span{pointer-events:auto}
+#lockhint span{background:rgba(0,0,0,.7);border:1px solid #ff4d4d;padding:12px 24px;border-radius:12px;font-size:20px}
+/* question */
+#qbox{z-index:6;background:rgba(3,4,8,.82)}
+#qcard{background:#12151d;border:2px solid #3a4258;border-radius:18px;padding:22px 28px;width:min(900px,95vw)}
+#qTitle{color:#ffd34a;font-size:18px;margin-bottom:8px}
+#qText{font-size:clamp(24px,3.4vw,36px);font-weight:700;margin:6px 0 18px;line-height:1.3}
+#qOpts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){#qOpts{grid-template-columns:1fr}}
+.opt{font-size:clamp(20px,2.6vw,28px);padding:16px;border-radius:14px;border:3px solid var(--c);background:#0d1018;color:#fff;text-align:left}
+.opt:hover:not(:disabled){background:var(--c)}
+.opt .ol{display:inline-block;width:38px;height:38px;line-height:38px;text-align:center;border-radius:50%;background:var(--c);margin-right:10px;font-weight:700}
+.opt.pick{outline:4px solid #fff}.opt.right{background:#1c8a4b;border-color:#43e88b}.opt.wrong{background:#8a1c1c;border-color:#ff6b6b}.opt.gone{opacity:.15}
+.opt:disabled{cursor:default}
+#qMsg{font-size:22px;min-height:34px;margin-top:14px;font-weight:700}.good{color:#5fe39a}.bad{color:#ff7b7b}
+.small{background:#222a3c;border:1px solid #3a4258;color:#fff;border-radius:8px;padding:8px 14px;font-size:16px;margin:10px 6px 0}
+/* meeting */
+#meet{z-index:7;justify-content:flex-start}
+#meet h2{font-size:30px;margin:6px 0}
+#meetStage{font-size:19px;color:#ffd34a;margin-bottom:4px}
+#meetTime{font-size:46px;font-weight:700;color:#ff6b6b;min-height:56px}
+#meetGrid{display:grid;grid-template-columns:repeat(4,minmax(130px,180px));gap:12px;justify-content:center;margin:8px 0}
+@media(max-width:800px){#meetGrid{grid-template-columns:repeat(2,1fr)}}
+.vc{background:#141824;border:2px solid #2b3142;border-radius:14px;padding:12px 8px;position:relative}
+.vc .ve{font-size:42px}.vc.can{cursor:pointer;border-color:#5b6ea0}.vc.can:hover{border-color:#ff4d4d;background:#2a1318}
+.vc.sel{border-color:#ff4d4d;background:#3a1620}.vc.dead{opacity:.35}.vc small{display:block;color:#ff9b9b}
+.vt{position:absolute;top:4px;right:6px;font-size:12px;color:#6ff0a0}.vn{position:absolute;top:4px;left:6px;font-size:14px;color:#ffd34a;font-weight:700}
+#meetRes .big,#meetRes .big2{font-size:30px;font-weight:700;margin:8px 0}
+#meetClues{max-width:640px;text-align:left;background:#12151d;border:1px solid #3a4258;border-radius:12px;padding:10px 18px;margin-top:8px;font-size:16px}
+#meetClues ul{margin:6px 0;padding-left:20px}
+/* role / end / misc */
+#role{z-index:9;background:#000}
+#roleTapBox{flex-direction:column;align-items:center;padding:20px}
+#roleBig{font-size:clamp(36px,7vw,80px);font-weight:900;letter-spacing:3px}#roleBig.k{color:#ff2a2a;text-shadow:0 0 40px #f00}#roleBig.c{color:#7fe3ff;text-shadow:0 0 30px #09f}
+#roleSub{max-width:640px;font-size:20px;line-height:1.5;color:#cbd2e0;margin-top:14px}
+#end{z-index:8;background:rgba(0,0,0,.92)}
+#endTitle{font-size:clamp(34px,6vw,64px);font-weight:900;margin:0}#endTitle.c{color:#5fe39a}#endTitle.k{color:#ff3a3a}
+#endSub{font-size:22px;margin:12px 0}
+table{border-collapse:collapse;margin:10px auto;font-size:17px}th,td{padding:6px 14px;border-bottom:1px solid #2b3142}tr.kr td{color:#ff7b7b}
+#pausebox,#lost{z-index:10;background:rgba(0,0,0,.75);font-size:34px;font-weight:700}
+#jump{z-index:12;background:#000}#jump canvas{width:min(100vw,133vh);height:auto;max-height:100vh}#jump.calm canvas{width:min(90vw,640px)}
+#cluebox,#menu{z-index:9}
+#cluebox ul{text-align:left;font-size:20px;line-height:1.6;max-width:640px}
+#menu .card{max-width:560px;text-align:left}#menu p{margin:6px 0;color:#c0c8d8}
+#menu input[type=range]{padding:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="gl"></canvas>
+  <div id="vig"></div><div id="danger"></div><div id="flash"></div>
+
+  <div id="hud">
+    <div id="topbar"><div id="progWrap"><div id="progBar"></div></div><div id="progTxt"></div></div>
+    <div id="hudRole" class="crew">CREW</div><div id="hudMap"></div>
+    <div id="fps"></div>
+    <canvas id="mini" width="180" height="240"></canvas>
+    <div id="cross"></div>
+    <div id="taskList"></div>
+    <div id="abil"></div>
+    <div id="killbtn"></div>
+    <div id="prompt"></div>
+    <button class="hbtn" id="btnClues">📓 Clues (<span id="clueN">0</span>) [C]</button>
+    <button class="hbtn" id="btnMenu">☰ Menu</button>
+  </div>
+  <button id="btnBreak">😟 I need a break [H]</button>
+  <div id="bodyBanner"><div id="bbT"></div><div id="bbS"></div></div>
+  <div id="toast"></div>
+  <div id="lockhint"><span>🖱️ Click to look around &nbsp;·&nbsp; WASD to walk &nbsp;·&nbsp; E to use</span></div>
+
+  <div id="join" class="screen">
+    <h1>SHADOW ESCAPE</h1><p class="sub">Who is the killer? Answer, escape, and find out!</p>
+    <div class="card">
+      <label class="l">Your name</label><input id="nm" maxlength="14" placeholder="Name" autocomplete="off">
+      <label class="l">Room code (from your teacher)</label><input id="code" maxlength="4" placeholder="ABCD" autocomplete="off">
+      <label class="l">Graphics (choose Low if the game is slow)</label>
+      <select id="gfx"><option value="a" selected>Auto (recommended)</option><option value="s">Smooth (very slow laptops)</option><option value="0">Low (simple look)</option><option value="1">Medium (richer look)</option><option value="2">High (richer look + shadows)</option></select>
+      <button class="big" id="btnJoin">JOIN GAME</button>
+      <div id="jmsg"></div>
+    </div>
+  </div>
+
+  <div id="lobby" class="screen">
+    <h2>You are in! Pick your job</h2>
+    <div style="color:#9aa3b5">Everyone needs a different job. Each job has its own special power. Waiting for the teacher to start…</div>
+    <div id="lobPlayers"></div>
+    <div id="jobGrid"></div>
+  </div>
+
+  <div id="qbox" class="screen">
+    <div id="qcard">
+      <div id="qTitle"></div><div id="qText"></div><div id="qOpts"></div><div id="qMsg"></div>
+      <button class="small" id="qHint" style="display:none"></button><button class="small" id="qClose">Close (Esc)</button>
+      <div style="color:#7f8aa3;font-size:13px;margin-top:8px">Tip: press 1 2 3 4 or A B C D on the keyboard</div>
+    </div>
+  </div>
+
+  <div id="meet" class="screen over">
+    <h2 id="meetTitle"></h2><div id="meetStage"></div><div id="meetTime"></div>
+    <div id="meetGrid"></div>
+    <button class="small" id="btnReady" style="display:none">✅ I'm ready to vote</button>
+    <div id="meetWait" style="min-height:30px;font-size:19px;color:#9fe3b0;margin:6px 0"></div>
+    <button class="small" id="btnSkip" style="display:none">⏭️ Skip vote (not sure)</button>
+    <div id="meetRes" style="display:none"></div>
+    <div id="meetClues"></div>
+  </div>
+
+  <div id="role" class="screen"><div id="roleTapBox"><div style="font-size:70px">🎭</div><h1 style="color:#fff;text-shadow:none;letter-spacing:0">Cover your screen!</h1><p style="font-size:22px;color:#cbd2e0;max-width:560px;line-height:1.5">Nobody else should see your secret role.<br>Tap the button when you are ready.</p><button class="big" id="btnRoleTap" style="max-width:380px">Tap to see my role</button></div><div id="roleShow" style="display:none"><div id="roleBig"></div><div id="roleSub"></div></div></div>
+
+  <div id="end" class="screen over"><h1 id="endTitle" style="text-shadow:none;letter-spacing:0"></h1><div id="endSub"></div><table id="endTable"></table><div style="color:#9aa3b5">Waiting for your teacher to start a new round…</div></div>
+
+  <div id="breakbox" class="screen"><div style="font-size:80px">💙</div><h1>Take a deep breath</h1><p>You are safe. This is only a game.<br>Your teacher can see that you are taking a break, and <b>nobody can catch you</b> right now.<br>Come back when you feel ready.</p><button class="big" id="btnBreakEnd" style="max-width:340px">I'm ready to continue</button></div>
+  <div id="pausebox" class="screen">⏸ The teacher paused the game</div>
+  <div id="lost" class="screen"><div id="lostMsg"></div></div>
+  <div id="jump" class="screen"><canvas id="jumpc" width="640" height="480"></canvas></div>
+
+  <div id="cluebox" class="screen over"><h2>📓 Clue notebook</h2><ul id="clueList"></ul><button class="small" id="btnCluesClose">Close [C]</button></div>
+
+  <div id="menu" class="screen over">
+    <div class="card">
+      <h2 style="margin-top:0">☰ Menu</h2>
+      <p><b>Controls:</b> W A S D = walk · Mouse = look · <b>E</b> = do task / report / open lock · <b>F</b> or click = catch (killer) · <b>Q</b> = your power · <b>C</b> = clues · <b>H</b> = I need a break · Arrow ◀ ▶ = turn</p>
+      <label class="l">Volume</label><input id="vol" type="range" min="0" max="100" value="80">
+      <label class="l">Graphics (choose Smooth if the game is slow)</label>
+      <select id="myGfx"><option value="s">Smooth (slow laptops)</option><option value="0">Low (simple look)</option><option value="1">Medium (richer look)</option><option value="2">High (richer look + shadows)</option></select>
+      <label class="l" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="chkFps" style="width:auto;margin:0"> Show the speed (FPS) counter</label>
+      <label class="l">Scary level (only for you)</label>
+      <select id="myScare"><option value="2" selected>Full scary</option><option value="1">Less scary</option><option value="0">Calm (no jump scares)</option></select>
+      <button class="big" id="btnResume">Back to the game</button>
+    </div>
+  </div>
+</div>
+<script src="student.js"></script>
+</body>
+</html>

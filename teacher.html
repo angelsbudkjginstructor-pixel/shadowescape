@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shadow Escape - Teacher</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d0f15;color:#e6e9f0;font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px}
+header{background:linear-gradient(90deg,#2a0d14,#12151d);padding:12px 22px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-bottom:1px solid #2b3142}
+h1{margin:0;font-size:24px;color:#ff5a5a}
+#codeBox{background:#000;border:2px solid #ff4d4d;border-radius:12px;padding:4px 18px;text-align:center}
+#code{font-size:44px;font-weight:800;letter-spacing:10px;color:#fff}
+#codeBox small{display:block;color:#9aa3b5;margin-top:-6px}
+.ok{color:#5fe39a}.bad{color:#ff7b7b}.muted{color:#8793aa}
+#link{width:360px;max-width:80vw;padding:8px;background:#0b0d13;color:#fff;border:1px solid #3a4258;border-radius:8px}
+button{font:inherit;cursor:pointer}
+.btn{background:#d92b2b;color:#fff;border:0;border-radius:10px;padding:11px 22px;font-weight:700}
+.btn:disabled{background:#444;color:#999;cursor:not-allowed}
+.btn.alt{background:#2a3350}.btn.alt:hover{background:#38446b}
+.mini,.mini2{background:#222a3c;color:#fff;border:1px solid #3a4258;border-radius:6px;padding:3px 9px;font-size:13px}
+main{padding:18px 22px;max-width:1250px;margin:0 auto}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:#12151d;border:1px solid #2b3142;border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.panel h3{margin:0 0 10px;font-size:17px;color:#ffd34a}
+.pl{padding:6px 4px;border-bottom:1px solid #1d2230;font-size:17px}.em{font-size:22px}.pl small{color:#8793aa}
+input[type=text],input[type=number],select{background:#0b0d13;color:#fff;border:1px solid #3a4258;border-radius:8px;padding:8px 10px;font-size:15px}
+input[type=text]{width:100%}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:8px 0}
+.row label{display:flex;flex-direction:column;font-size:13px;color:#9aa3b5;gap:3px}
+#mapPick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:700px){#mapPick{grid-template-columns:repeat(2,1fr)}}
+.mapcard{position:relative;cursor:pointer}.mapcard input{position:absolute;opacity:0}
+.mapcard span{display:block;text-align:center;background:#0b0d13;border:2px solid #2b3142;border-radius:12px;padding:10px 4px;font-size:30px}
+.mapcard span b{font-size:14px}
+.mapcard input:checked+span{border-color:#ff4d4d;background:#2a1318}
+.chk{display:inline-block;margin:3px 12px 3px 0;font-size:15px}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #1d2230}th{color:#9aa3b5;font-size:13px}
+.tag{background:#222a3c;border-radius:6px;padding:2px 8px;font-size:13px}.tag.r{background:#5a1313;color:#ff9b9b}.tag.g{background:#13502f;color:#8bf0b4}.tag.y{background:#5a4300;color:#ffe08a}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:50;display:none;align-items:center;justify-content:center}.mbox{background:#12151d;border:2px solid #ff4d4d;border-radius:16px;padding:22px 28px;max-width:92vw}
+#killerList{display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:8px}#killerList button{background:#1a1f2c;color:#fff;border:1px solid #3a4258;border-radius:10px;padding:12px;font-size:18px}#killerList button:hover{border-color:#ff4d4d}
+#breakBanner{display:none;background:#0f3350;color:#9fd8ff;padding:10px 14px;border-radius:10px;margin-bottom:12px;border:1px solid #2a6a96}
+#gLog{max-height:230px;overflow:auto;font-size:14px;color:#c0c8d8}
+#progWrap{height:22px;background:#000;border:1px solid #3a4258;border-radius:12px;overflow:hidden}
+#gProg{height:100%;width:0;background:linear-gradient(90deg,#3ddc84,#b6ff6a);transition:width .4s}
+#pauseBanner{display:none;background:#5a4300;color:#ffe08a;text-align:center;padding:10px;font-weight:700;border-radius:10px;margin-bottom:12px}
+.endb{text-align:center;font-size:44px;font-weight:900;padding:22px;border-radius:16px;margin-bottom:16px}.endb small{display:block;font-size:20px;font-weight:400;margin-top:6px}
+.endb.crew{background:#0f3d26;color:#7bf0aa}.endb.killer{background:#4a1010;color:#ff8b8b}
+</style>
+</head>
+<body>
+<header>
+  <h1>👻 Shadow Escape — Teacher</h1>
+  <div id="codeBox"><div id="code">····</div><small>ROOM CODE</small></div>
+  <div><div class="muted" style="font-size:13px">Student link (or tell them the code)</div>
+    <input id="link" readonly> <button class="btn alt" id="btnCopy" style="padding:7px 12px">Copy link</button>
+    <div id="status" class="muted">Opening room…</div></div>
+</header>
+<main>
+  <div id="breakBanner"></div>
+  <div id="killerModal" class="modal"><div class="mbox"><h3>Who is the killer? <small class="muted">(make sure nobody is looking)</small></h3><div id="killerList"></div><button class="btn alt" id="killerCancel" style="margin-top:12px">Cancel</button></div></div>
+  <div id="revealModal" class="modal"><div class="mbox" style="text-align:center"><div style="font-size:22px;color:#ff8b8b">🔪 The killer is</div><div id="revealName" style="font-size:60px;font-weight:900;margin:12px 0"></div><button class="btn" id="revealHide" style="font-size:20px">Hide it now</button><div class="muted" id="revealTimer" style="margin-top:8px"></div></div></div>
+  <div id="pauseBanner">⏸ GAME PAUSED — students are frozen</div>
+
+  <div id="view-lobby">
+    <div class="grid">
+      <div class="panel"><h3>👥 Students (<span id="pcount">0</span>)</h3><div id="plist"></div></div>
+      <div>
+        <div class="panel"><h3>🗺️ 1. Choose the map</h3><div id="mapPick"></div></div>
+        <div class="panel"><h3>📚 2. Questions</h3>
+          <div class="muted" style="font-size:13px;margin-bottom:4px">Paste the same "published to web" CSV link you use for EduStrike (leave empty to use the built-in sample questions).</div>
+          <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+          <div class="row"><button class="btn alt" id="btnLoad">Load questions</button><span id="sheetStatus" class="muted">Using the built-in sample questions.</span></div>
+          <div class="row"><label>Subject<select id="subjectSel"></select></label><span id="poolInfo" class="muted"></span></div>
+          <div id="topicBox"></div>
+        </div>
+        <div class="panel"><h3>🔪 3. Choose the killer (private)</h3>
+          <div class="row"><button class="btn alt" id="btnPickKiller">🔒 Choose the killer…</button><button class="btn alt" id="btnRandomKiller">🎲 Random</button><span id="killerState" class="muted">Not chosen yet</span></div>
+          <div class="muted" style="font-size:13px">The name stays hidden on this page. When the game starts a private pop-up tells only you who the killer is.</div></div>
+        <div class="panel"><h3>⚙️ 4. Game settings</h3>
+          <div class="row">
+            <label>Game mode<select id="cfgMode"><option value="classic" selected>Classic - find and vote out the killer</option><option value="survival">Survival - run from the killer (hard)</option></select></label>
+            <label>Tasks per student<input type="number" id="cfgTasks" value="3" min="1" max="10" style="width:90px"></label>
+            <label>Killer cooldown (sec)<input type="number" id="cfgCd" value="25" min="8" max="90" style="width:90px"></label>
+            <label>Discussion (sec)<input type="number" id="cfgDisc" value="20" min="10" max="180" style="width:90px"></label>
+            <label>Voting (sec)<input type="number" id="cfgVote" value="15" min="8" max="90" style="width:90px"></label>
+            <label>Emergency meetings each<input type="number" id="cfgEmerg" value="1" min="0" max="3" style="width:90px"></label>
+            <label>Round time limit (minutes, 0 = none)<input type="number" id="cfgLimit" value="15" min="0" max="60" style="width:90px"></label>
+            <label>Graphics style<select id="cfgLook"><option value="auto" selected>Auto - richer look on laptops that can handle it</option><option value="classic">Classic only - the simple, fastest look for everyone</option></select></label>
+            <label>Scare level<select id="cfgScare"><option value="2" selected>Fully scary</option><option value="1">Spooky (no jump scares)</option><option value="0">Calm</option></select></label>
+          </div></div>
+        <button class="btn" id="btnStart" disabled style="font-size:20px;padding:14px 34px">▶ START GAME</button>
+        <span id="startHint" class="muted" style="margin-left:12px"></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-game" style="display:none">
+    <div class="panel">
+      <div id="gInfo" class="muted" style="margin-bottom:6px"></div>
+      <div id="progWrap"><div id="gProg"></div></div><div id="gProgTxt" style="margin-top:4px"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn alt" id="btnPause">⏸ Pause game</button>
+        <button class="btn alt" id="btnMeet">🚨 Call meeting now</button>
+        <button class="btn alt" id="btnSkip">⏭ Skip discussion</button>
+        <button class="btn alt" id="btnAddTime">⏱ +2 minutes</button>
+        <label>Graphics style (live)<select id="liveLook"><option value="auto">Auto</option><option value="classic">Classic only</option></select></label>
+        <label>Scare level (live)<select id="liveScare"><option value="2">Fully scary</option><option value="1">Spooky</option><option value="0">Calm</option></select></label>
+        <label class="chk" style="flex-direction:row;align-items:center;gap:6px;color:#ffd34a"><input type="checkbox" id="secretChk"> 👁 Show killer + positions (hides itself after 15 s)</label>
+        <button class="btn" id="btnEnd" style="margin-left:auto">⏹ End round</button>
+      </div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 330px">
+      <div class="panel"><h3>Students</h3><table id="gTable"></table></div>
+      <div><div class="panel"><h3>Map view</h3><canvas id="mini" width="300" height="400" style="width:100%;border-radius:8px"></canvas></div></div>
+    </div>
+    <div class="panel"><h3>Activity</h3><div id="gLog"></div></div>
+  </div>
+
+  <div id="view-end" style="display:none">
+    <div id="endBanner" class="endb"></div>
+    <div class="panel"><h3>Results</h3><table id="endTable"></table></div>
+    <button class="btn alt" id="btnCSV">⬇ Download results (CSV)</button>
+    <button class="btn" id="btnAgain">🔁 New round (same students)</button>
+  </div>
+</main>
+<script src="teacher.js"></script>
+</body>
+</html>
