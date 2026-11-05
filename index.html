@@ -81,6 +81,12 @@ button{font:inherit;cursor:pointer}
 #lockhint span{pointer-events:auto}
 #lockhint span{background:rgba(0,0,0,.7);border:1px solid #ff4d4d;padding:12px 24px;border-radius:12px;font-size:20px}
 /* question */
+#kpbox{z-index:6;background:rgba(3,4,8,.86)}
+#kpbox .card{background:#10141f;border:2px solid #2fb36b;border-radius:16px;padding:18px 22px;max-width:92vw;width:380px}
+#kpbox h2{margin:0 0 6px;font-size:24px;color:#7fe3ff}#kpCode{font-size:30px;font-weight:900;letter-spacing:6px;color:#ffd34a;margin:6px 0 10px;min-height:38px}
+#kpIn{width:100%;font-size:34px;text-align:center;letter-spacing:8px;padding:8px;border-radius:10px;border:2px solid #3a4258;background:#05070c;color:#fff}
+#kpPad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}#kpPad button{font-size:26px;font-weight:700;padding:10px 0;border-radius:10px;border:1px solid #3a4258;background:#1a2030;color:#fff}
+#btnWarn{position:absolute;left:10px;top:190px;z-index:15;display:none;background:rgba(80,60,0,.85);border:1px solid #d0a84a;color:#ffe9b0;border-radius:8px;padding:8px 12px;font-size:15px}
 #qbox{z-index:6;background:rgba(3,4,8,.82)}
 #qcard{background:#12151d;border:2px solid #3a4258;border-radius:18px;padding:22px 28px;width:min(900px,95vw)}
 #qTitle{color:#ffd34a;font-size:18px;margin-bottom:8px}
@@ -144,6 +150,7 @@ table{border-collapse:collapse;margin:10px auto;font-size:17px}th,td{padding:6px
     <button class="hbtn" id="btnClues">📓 Clues (<span id="clueN">0</span>) [C]</button>
     <button class="hbtn" id="btnMenu">☰ Menu</button>
   </div>
+  <button id="btnWarn">📣 Warn others [V]</button>
   <button id="btnBreak">😟 I need a break [H]</button>
   <div id="bodyBanner"><div id="bbT"></div><div id="bbS"></div></div>
   <div id="toast"></div>
@@ -168,6 +175,7 @@ table{border-collapse:collapse;margin:10px auto;font-size:17px}th,td{padding:6px
     <div id="jobGrid"></div>
   </div>
 
+  <div id="kpbox" class="screen"><div class="card"><h2>🔢 EXIT KEYPAD</h2><div style="color:#9aa3b5;font-size:15px">Type your personal code to open the door:</div><div id="kpCode"></div><input id="kpIn" inputmode="numeric" autocomplete="off" placeholder="• • • •"><div id="kpPad"><button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="C">C</button><button data-k="0">0</button><button id="kpOk" style="background:#157a3e">OK</button></div><button class="small" id="kpClose">Close [Esc]</button></div></div>
   <div id="qbox" class="screen">
     <div id="qcard">
       <div id="qTitle"></div><div id="qText"></div><div id="qOpts"></div><div id="qMsg"></div>
