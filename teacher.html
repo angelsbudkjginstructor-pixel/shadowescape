@@ -44,6 +44,9 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:7px 10px
 #gLog{max-height:230px;overflow:auto;font-size:14px;color:#c0c8d8}
 #progWrap{height:22px;background:#000;border:1px solid #3a4258;border-radius:12px;overflow:hidden}
 #gProg{height:100%;width:0;background:linear-gradient(90deg,#3ddc84,#b6ff6a);transition:width .4s}
+#offBanner{display:none;background:#5a1313;color:#ffb0b0;text-align:center;padding:12px;font-weight:800;font-size:18px;border-radius:10px;margin-bottom:12px;border:2px solid #ff4d4d}
+.onbtn{background:#157a3e!important;color:#fff;font-size:17px;font-weight:800;padding:12px 18px}.offbtn{background:#c0212b!important;color:#fff;font-size:17px;font-weight:800;padding:12px 18px;animation:pulseoff 1.2s infinite}@keyframes pulseoff{50%{opacity:.7}}
+button:disabled{opacity:.45;cursor:not-allowed}
 #pauseBanner{display:none;background:#5a4300;color:#ffe08a;text-align:center;padding:10px;font-weight:700;border-radius:10px;margin-bottom:12px}
 .endb{text-align:center;font-size:44px;font-weight:900;padding:22px;border-radius:16px;margin-bottom:16px}.endb small{display:block;font-size:20px;font-weight:400;margin-top:6px}
 .endb.crew{background:#0f3d26;color:#7bf0aa}.endb.killer{background:#4a1010;color:#ff8b8b}
@@ -52,6 +55,7 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:7px 10px
 <body>
 <header>
   <h1>👻 Shadow Escape — Teacher</h1>
+  <button class="btn onbtn" id="btnOff" title="Switch the whole game ON or OFF for all students">🟢 Game is ON — click to switch OFF</button>
   <div id="codeBox"><div id="code">····</div><small>ROOM CODE</small></div>
   <div><div class="muted" style="font-size:13px">Student link (or tell them the code)</div>
     <input id="link" readonly> <button class="btn alt" id="btnCopy" style="padding:7px 12px">Copy link</button>
@@ -61,6 +65,7 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:7px 10px
   <div id="breakBanner"></div>
   <div id="killerModal" class="modal"><div class="mbox"><h3>Who is the killer? <small class="muted">(make sure nobody is looking)</small></h3><div id="killerList"></div><button class="btn alt" id="killerCancel" style="margin-top:12px">Cancel</button></div></div>
   <div id="revealModal" class="modal"><div class="mbox" style="text-align:center"><div style="font-size:22px;color:#ff8b8b">🔪 The killer is</div><div id="revealName" style="font-size:60px;font-weight:900;margin:12px 0"></div><button class="btn" id="revealHide" style="font-size:20px">Hide it now</button><div class="muted" id="revealTimer" style="margin-top:8px"></div></div></div>
+  <div id="offBanner">⛔ GAME IS OFF — every student screen is locked and the clock is stopped. Click the red button at the top to switch it back ON.</div>
   <div id="pauseBanner">⏸ GAME PAUSED — students are frozen</div>
 
   <div id="view-lobby">
