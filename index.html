@@ -80,6 +80,9 @@ button{font:inherit;cursor:pointer}
 #vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75) 100%)}
 #danger{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(255,0,0,.65) 100%)}
 #flash{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
+#stormfx{position:absolute;inset:0;pointer-events:none;opacity:0;background:#eef3ff}
+#stormfx.go{animation:sfx .5s ease-out}
+@keyframes sfx{0%{opacity:var(--sa,.8)}100%{opacity:0}}
 #lockhint{position:absolute;inset:0;display:none;align-items:flex-end;justify-content:center;padding-bottom:140px;cursor:pointer;z-index:4;pointer-events:none}
 #lockhint span{pointer-events:auto}
 #lockhint span{background:rgba(0,0,0,.7);border:1px solid #ff4d4d;padding:12px 24px;border-radius:12px;font-size:20px}
@@ -139,7 +142,7 @@ table{border-collapse:collapse;margin:10px auto;font-size:17px}th,td{padding:6px
 <body>
 <div id="app">
   <canvas id="gl"></canvas>
-  <div id="vig"></div><div id="shieldfx"></div><div id="sniffArrow"><span>⬆</span><small></small></div><div id="danger"></div><div id="flash"></div>
+  <div id="vig"></div><div id="shieldfx"></div><div id="sniffArrow"><span>⬆</span><small></small></div><div id="danger"></div><div id="flash"></div><div id="stormfx"></div>
 
   <div id="hud">
     <div id="topbar"><div id="progWrap"><div id="progBar"></div></div><div id="progTxt"></div></div>
