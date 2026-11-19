@@ -85,7 +85,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
           <div class="muted" style="font-size:13px">The name stays hidden on this page. When the game starts a private pop-up tells only you who the killer is.</div></div>
         <div class="panel"><h3>⚙️ 4. Game settings</h3>
           <div class="row">
-            <label>Game mode<select id="cfgMode"><option value="classic" selected>Classic - find and vote out the killer</option><option value="survival">Survival - run from the killer (hard)</option></select></label>
+            <label>Game mode<select id="cfgMode"><option value="classic" selected>Classic - find and vote out the killer</option><option value="survival">Survival - run from the killer (hard)</option><option value="detective">Detective - find clues, then vote out the killer</option></select></label>
+            <label id="cluesRow" style="display:none">Clues needed before the vote<input type="number" id="cfgClues" value="4" min="2" max="8" style="width:90px"></label>
             <label>Tasks per student<input type="number" id="cfgTasks" value="3" min="1" max="10" style="width:90px"></label>
             <label>Killer cooldown (sec)<input type="number" id="cfgCd" value="25" min="8" max="90" style="width:90px"></label>
             <label>Discussion (sec)<input type="number" id="cfgDisc" value="20" min="10" max="180" style="width:90px"></label>
